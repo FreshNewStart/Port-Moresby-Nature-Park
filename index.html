@@ -20,55 +20,57 @@
     </div>
 
     <script>
-    const html5Qrcode = new Html5Qrcode('reader');
+        const html5Qrcode = new Html5Qrcode('reader');
 
-    const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
-        if (!decodedText) return;
+        const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
+            if (!decodedText) return;
 
-        // Show result
-        document.getElementById('show').style.display = 'block';
-        document.getElementById('result').textContent = decodedText;
+            // DEBUG: always see what is scanned
+            console.log("RAW SCAN:", decodedText);
+            alert(decodedText);
 
-        // Stop scanner first
-        await html5Qrcode.stop();
+            // show result on UI
+            document.getElementById('show').style.display = 'block';
+            document.getElementById('result').textContent = decodedText;
 
-        // Clean the scanned text
-        let text = decodedText.trim();
+            // stop scanner
+            await html5Qrcode.stop();
 
-        // Auto-fix missing protocol (VERY IMPORTANT)
-        if (text.startsWith("www.")) {
-            text = "https://" + text;
-        }
+            // clean text (remove spaces, line breaks, hidden chars)
+            let text = decodedText.trim().replace(/\s/g, "");
 
-        // Check if it's a valid URL
-        let isUrl = false;
+            // auto-fix missing protocol
+            if (!text.startsWith("http://") && !text.startsWith("https://")) {
+                text = "https://" + text;
+            }
 
-        try {
-            const url = new URL(text);
-            isUrl = url.protocol === "http:" || url.protocol === "https:";
-        } catch (e) {
-            isUrl = false;
-        }
+            console.log("REDIRECTING TO:", text);
 
-        // Redirect if valid
-        if (isUrl) {
-            window.location.href = text;
-        } else {
-            console.log("Not a valid URL:", text);
-        }
-    };
+            // try multiple redirect methods (max compatibility)
+            setTimeout(() => {
+                try {
+                    // best modern method
+                    window.location.assign(text);
+                } catch (e) {
+                    console.error("Redirect failed:", e);
 
-    const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }
-    };
+                    // fallback
+                    window.open(text, "_blank");
+                }
+            }, 200);
+        };
 
-    html5Qrcode.start(
-        { facingMode: "environment" },
-        config,
-        qrCodeSuccessCallback
-    );
-</script>
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+        };
+
+        html5Qrcode.start(
+            { facingMode: "environment" },
+            config,
+            qrCodeSuccessCallback
+        );
+    </script>
 
 </body>
 </html>
