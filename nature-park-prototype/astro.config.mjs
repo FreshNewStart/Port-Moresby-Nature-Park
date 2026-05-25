@@ -1,5 +1,8 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
+import githubPages from '@astrojs/github-pages';
 
-// https://astro.build/config
-export default defineConfig({});
+export default defineConfig({
+  site: 'https://FreshNewStart.github.io',
+  base: '/Port-Moresby-Nature-Park',
+  integrations: [githubPages()]
+});
