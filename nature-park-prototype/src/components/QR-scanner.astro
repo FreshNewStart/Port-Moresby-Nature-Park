@@ -10,25 +10,22 @@
 
 </div>
 
-<!-- IMPORTANT: load FIRST -->
-<script src="https://unpkg.com/html5-qrcode@2.3.10/minified/html5-qrcode.min.js"></script>
+<!-- FIXED CDN -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script is:inline>
 
   let scanner;
-
   const status = document.getElementById("status");
-  const btn = document.getElementById("startScan");
 
-  btn.addEventListener("click", async () => {
+  document.getElementById("startScan").addEventListener("click", () => {
 
     try {
 
-      status.innerText = "Starting camera...";
+      status.innerText = "Loading camera...";
 
-      // 🔥 IMPORTANT: wait for library to exist
       if (!window.Html5QrcodeScanner) {
-        throw new Error("QR library not loaded");
+        throw new Error("Library failed to load");
       }
 
       scanner = new window.Html5QrcodeScanner(
@@ -42,11 +39,9 @@
 
       scanner.render(onScanSuccess, onScanError);
 
-      console.log("Scanner started");
-
     } catch (err) {
       console.error(err);
-      status.innerText = "ERROR: " + err.message;
+      status.innerText = err.message;
     }
 
   });
@@ -62,9 +57,7 @@
     }
   }
 
-  function onScanError(err) {
-    // ignore
-  }
+  function onScanError(err) {}
 
 </script>
 
