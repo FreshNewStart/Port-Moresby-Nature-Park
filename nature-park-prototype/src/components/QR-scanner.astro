@@ -1,36 +1,63 @@
-<div class="scanner">
+---
+// src/components/QrScanner.astro
+---
 
-  <h2>Scan Animal QR Code</h2>
+<div class="scanner-wrapper">
+  <div id="reader"></div>
 
-  <button id="start">Start Scanner</button>
-
-  <video id="video" playsinline></video>
-
-  <p id="status">Idle</p>
-
+  <div id="show" style="display: none;">
+    <h4>Scanned Result</h4>
+    <p id="result"></p>
+  </div>
 </div>
 
-<script>
-  import("../scripts/qr-scanner.js");
+<script type="module">
+  import "/src/scripts/qrScript.js";
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    const html5Qrcode = new Html5Qrcode("reader");
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+      if (decodedText) {
+        document.getElementById("show").style.display = "block";
+        document.getElementById("result").textContent = decodedText;
+
+        html5Qrcode.stop();
+      }
+    };
+
+    const config = {
+      fps: 10,
+      qrbox: {
+        width: 250,
+        height: 250,
+      },
+    };
+
+    try {
+      await html5Qrcode.start(
+        { facingMode: "environment" },
+        config,
+        qrCodeSuccessCallback
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  });
 </script>
 
 <style>
+  .scanner-wrapper {
+    text-align: center;
+  }
 
-.scanner {
-  text-align: center;
-  padding: 20px;
-}
+  #reader {
+    width: 500px;
+    max-width: 100%;
+    margin: auto;
+  }
 
-video {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  margin-top: 10px;
-}
-
-button {
-  padding: 10px 15px;
-  margin-top: 10px;
-}
-
+  #result {
+    color: blue;
+  }
 </style>
