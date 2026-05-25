@@ -1,0 +1,157 @@
+<div class="tabs">
+<img class="logo" src="/Port-Moresby-Nature-Park/logo_pmnp.png" alt="ffff">
+  <div class="tab-body">
+    <div class="active">
+      <h1>Home</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt provident ducimus, consectetur dolor consequuntur fugiat obcaecati sed quam nam repellat beatae itaque libero dignissimos quaerat illum ab reiciendis. Quia, facilis?</p>
+      <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus soluta necessitatibus illo quasi porro ea. Ex, sit dolor ipsum nemo alias atque iure praesentium fugit id nobis ducimus ut beatae!</p>
+    </div>
+    <div>
+      <h1>Camera</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt provident ducimus, consectetur dolor consequuntur fugiat obcaecati sed quam nam repellat beatae itaque libero dignissimos quaerat illum ab reiciendis. Quia, facilis?</p>
+      <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus soluta necessitatibus illo quasi porro ea. Ex, sit dolor ipsum nemo alias atque iure praesentium fugit id nobis ducimus ut beatae!</p>
+    </div>
+    <div>
+      <h1>Files</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt provident ducimus, consectetur dolor consequuntur fugiat obcaecati sed quam nam repellat beatae itaque libero dignissimos quaerat illum ab reiciendis. Quia, facilis?</p>
+      <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus soluta necessitatibus illo quasi porro ea. Ex, sit dolor ipsum nemo alias atque iure praesentium fugit id nobis ducimus ut beatae!</p>
+    </div>
+  </div>
+  <div class="tab-header">
+    <div class="active">
+      <i class="fa fa-home"></i>
+      <span>Home</span>
+    </div>
+    <div>
+      <i class="fa fa-camera"></i>
+      <span>Camera</span>
+    </div>
+    <div>
+      <i class="fa fa-file"></i>
+      <span>File</span>
+    </div>
+  </div>
+</div>
+
+<style>
+    
+.tabs {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:80%;
+  border:1px solid #f5f5f5;
+}
+.logo{
+    width: 150px;
+    margin: 1rem;
+}
+.tabs .tab-body {
+  position:relative;
+  width:100%;
+  height:calc(100% - 60px);
+  overflow:hidden;
+}
+.tabs .tab-body > div {
+  position:absolute;
+  padding:20px;
+  top:-100%;
+  opacity:0;
+  transform:scale(0.85);
+  transition:top 0ms ease-in-out 100ms,
+             transform 200ms ease-in-out 0ms,
+             opacity 200ms ease-in-out 0ms;
+}
+.tabs .tab-body > div.active {
+  opacity:1;
+  transform:scale(1);
+  top:20px;
+  transition:top 0ms ease-in-out 0ms,
+             transform 200ms ease-in-out 0ms,
+             opacity 200ms ease-in-out 0ms;
+}
+.tabs .tab-body h1 {
+  font-size:40px;
+  color:#222;
+  margin-bottom:20px;
+}
+.tabs .tab-body p {
+  color:#555;
+  margin:10px 0px;
+  font-size:15px;
+}
+.tabs .tab-header {
+  position:relative;
+  width:100%;
+  height:60px;
+  bottom: -3rem;
+  border-top:1px solid #ddd;
+  background:#f5f5f5;
+  display:flex;
+  align-items:center;
+  justify-content: center;
+}
+.tabs .tab-header > div {
+  width:25%;
+  position:relative;
+  cursor:pointer;
+  text-align:center;
+}
+.tabs .tab-header > div:before {
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:50px;
+  height:50px;
+  border-radius:10px;
+  background:#5d84da;
+  z-index:1;
+  transition:all 200ms ease-in-out;
+}
+.tabs .tab-header > div i {
+  color:#555;
+  font-size:16px;
+}
+.tabs .tab-header > div span {
+  font-size:10px;
+  display:block;
+  margin-top:2px;
+  color:#555;
+  font-weight:600;
+}
+.tabs .tab-header > div.active:before {
+  transform:translate(-50%,-50%) scale(1);
+}
+.tabs .tab-header > div.active i,
+.tabs .tab-header > div.active span {
+  position:relative;
+  z-index:2;
+  color:#f5f5f5;
+}
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelector(".tabs");
+
+  if (!tabs) return;
+
+  const tabHeader = tabs.querySelector(".tab-header");
+  const tabBody = tabs.querySelector(".tab-body");
+
+  const tabHeaderElements = tabs.querySelectorAll(".tab-header > div");
+  const tabBodyElements = tabs.querySelectorAll(".tab-body > div");
+
+  tabHeaderElements.forEach((element, i) => {
+    element.addEventListener("click", () => {
+      tabHeader?.querySelector(".active")?.classList.remove("active");
+      element.classList.add("active");
+
+      tabBody?.querySelector(".active")?.classList.remove("active");
+      tabBodyElements[i].classList.add("active");
+    });
+  });
+});
+</script>
