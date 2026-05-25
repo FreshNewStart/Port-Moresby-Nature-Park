@@ -1,0 +1,71 @@
+<div class="scanner-container">
+
+  <h2>Scan Animal QR Code</h2>
+
+  <div id="reader" style="width:100%; max-width:400px;"></div>
+
+  <p id="scan-result">Waiting for scan...</p>
+
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script is:inline>
+
+  const resultBox = document.getElementById("scan-result");
+
+  function onScanSuccess(decodedText) {
+
+    resultBox.innerText = "Scanned: " + decodedText;
+
+    // CASE 1: full URL
+    if (decodedText.startsWith("http")) {
+      window.location.href = decodedText;
+      return;
+    }
+
+    // CASE 2: ID only
+    const id = decodedText.trim();
+
+    window.location.href = `/animals/${id}`;
+  }
+
+  function onScanError(error) {
+    // optional: ignore scanning noise
+  }
+
+  const html5QrCode = new Html5QrcodeScanner(
+    "reader",
+    {
+      fps: 10,
+      qrbox: 250,
+      rememberLastUsedCamera: true
+    },
+    false
+  );
+
+  html5QrCode.render(onScanSuccess, onScanError);
+
+</script>
+
+<style>
+
+.scanner-container {
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+#reader {
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#scan-result {
+  margin-top: 10px;
+  color: #2f6b2f;
+  font-weight: bold;
+}
+
+</style>
