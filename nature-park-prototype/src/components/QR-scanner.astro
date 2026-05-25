@@ -4,18 +4,19 @@
 
   <button id="start">Start Scanner</button>
 
-  <div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
+  <video id="video" style="width:100%; max-width:400px;"></video>
 
   <p id="status">Idle</p>
 
 </div>
 
-<!-- STABLE FIX -->
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@latest/html5-qrcode.min.js"></script>
+<script type="module">
 
-<script is:inline>
+  import { BrowserQRCodeReader } from "@zxing/browser";
 
-  let qr;
+  const codeReader = new BrowserQRCodeReader();
+
+  const video = document.getElementById("video");
   const status = document.getElementById("status");
 
   document.getElementById("start").addEventListener("click", async () => {
@@ -24,37 +25,36 @@
 
       status.innerText = "Starting camera...";
 
-      if (!window.Html5Qrcode) {
-        throw new Error("Library failed to load");
-      }
+      const devices = await BrowserQRCodeReader.listVideoInputDevices();
 
-      qr = new Html5Qrcode("reader");
-
-      const cameras = await Html5Qrcode.getCameras();
-
-      if (!cameras.length) {
+      if (!devices.length) {
         throw new Error("No camera found");
       }
 
-      const cameraId = cameras[0].id;
+      const firstDeviceId = devices[0].deviceId;
 
-      await qr.start(
-        cameraId,
-        {
-          fps: 10,
-          qrbox: 250
-        },
-        (decodedText) => {
+      codeReader.decodeFromVideoDevice(
+        firstDeviceId,
+        video,
+        (result, err) => {
 
-          status.innerText = decodedText;
+          if (result) {
 
-          if (decodedText.startsWith("http")) {
-            window.location.href = decodedText;
-          } else {
-            window.location.href = `/animals/${decodedText}`;
+            const text = result.getText();
+            status.innerText = text;
+
+            codeReader.reset();
+
+            if (text.startsWith("http")) {
+              window.location.href = text;
+            } else {
+              window.location.href = `/animals/${text}`;
+            }
+
           }
 
         }
+
       );
 
     } catch (err) {
@@ -76,6 +76,10 @@
 button {
   padding: 10px 14px;
   margin: 10px;
+}
+
+video {
+  border-radius: 12px;
 }
 
 </style>
