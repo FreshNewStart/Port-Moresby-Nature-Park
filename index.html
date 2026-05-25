@@ -20,39 +20,55 @@
     </div>
 
     <script>
-        const html5Qrcode = new Html5Qrcode('reader');
+    const html5Qrcode = new Html5Qrcode('reader');
 
-        const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
-            if (decodedText) {
+    const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
+        if (!decodedText) return;
 
-                // Show scanned result
-                document.getElementById('show').style.display = 'block';
-                document.getElementById('result').textContent = decodedText;
+        // Show result
+        document.getElementById('show').style.display = 'block';
+        document.getElementById('result').textContent = decodedText;
 
-                // Stop scanner
-                await html5Qrcode.stop();
+        // Stop scanner first
+        await html5Qrcode.stop();
 
-                // Auto redirect if it's a valid URL
-                if (
-                    decodedText.startsWith("http://") ||
-                    decodedText.startsWith("https://")
-                ) {
-                    window.location.href = decodedText;
-                }
-            }
-        };
+        // Clean the scanned text
+        let text = decodedText.trim();
 
-        const config = {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
-        };
+        // Auto-fix missing protocol (VERY IMPORTANT)
+        if (text.startsWith("www.")) {
+            text = "https://" + text;
+        }
 
-        html5Qrcode.start(
-            { facingMode: "environment" },
-            config,
-            qrCodeSuccessCallback
-        );
-    </script>
+        // Check if it's a valid URL
+        let isUrl = false;
+
+        try {
+            const url = new URL(text);
+            isUrl = url.protocol === "http:" || url.protocol === "https:";
+        } catch (e) {
+            isUrl = false;
+        }
+
+        // Redirect if valid
+        if (isUrl) {
+            window.location.href = text;
+        } else {
+            console.log("Not a valid URL:", text);
+        }
+    };
+
+    const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+    };
+
+    html5Qrcode.start(
+        { facingMode: "environment" },
+        config,
+        qrCodeSuccessCallback
+    );
+</script>
 
 </body>
 </html>
