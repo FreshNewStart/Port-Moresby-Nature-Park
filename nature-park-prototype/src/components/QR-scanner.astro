@@ -1,55 +1,55 @@
 <div class="scanner-container">
-
   <h2>Scan Animal QR Code</h2>
 
   <div id="reader" style="width:100%; max-width:400px;"></div>
 
   <p id="scan-result">Waiting for scan...</p>
-
 </div>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script is:inline>
 
-  const resultBox = document.getElementById("scan-result");
+  window.addEventListener("DOMContentLoaded", () => {
 
-  function onScanSuccess(decodedText) {
+    const resultBox = document.getElementById("scan-result");
 
-    resultBox.innerText = "Scanned: " + decodedText;
+    function onScanSuccess(decodedText) {
 
-    // CASE 1: full URL
-    if (decodedText.startsWith("http")) {
-      window.location.href = decodedText;
-      return;
+      resultBox.innerText = "Scanned: " + decodedText;
+
+      // Full URL QR
+      if (decodedText.startsWith("http")) {
+        window.location.href = decodedText;
+        return;
+      }
+
+      // ID-based QR
+      const id = decodedText.trim();
+      window.location.href = `/animals/${id}`;
     }
 
-    // CASE 2: ID only
-    const id = decodedText.trim();
+    function onScanError(error) {
+      // ignore noise
+    }
 
-    window.location.href = `/animals/${id}`;
-  }
+    const scanner = new Html5QrcodeScanner(
+      "reader",
+      {
+        fps: 10,
+        qrbox: 250,
+        rememberLastUsedCamera: true
+      },
+      false
+    );
 
-  function onScanError(error) {
-    // optional: ignore scanning noise
-  }
+    scanner.render(onScanSuccess, onScanError);
 
-  const html5QrCode = new Html5QrcodeScanner(
-    "reader",
-    {
-      fps: 10,
-      qrbox: 250,
-      rememberLastUsedCamera: true
-    },
-    false
-  );
-
-  html5QrCode.render(onScanSuccess, onScanError);
+  });
 
 </script>
 
 <style>
-
 .scanner-container {
   padding: 20px;
   text-align: center;
@@ -67,5 +67,4 @@
   color: #2f6b2f;
   font-weight: bold;
 }
-
 </style>
