@@ -4,65 +4,16 @@
 
   <button id="start">Start Scanner</button>
 
-  <video id="video" style="width:100%; max-width:400px;"></video>
+  <video id="video" playsinline></video>
 
   <p id="status">Idle</p>
 
 </div>
 
-<script type="module">
+<!-- IMPORTANT FIX -->
+<script>
 
-  import { BrowserQRCodeReader } from "@zxing/browser";
-
-  const codeReader = new BrowserQRCodeReader();
-
-  const video = document.getElementById("video");
-  const status = document.getElementById("status");
-
-  document.getElementById("start").addEventListener("click", async () => {
-
-    try {
-
-      status.innerText = "Starting camera...";
-
-      const devices = await BrowserQRCodeReader.listVideoInputDevices();
-
-      if (!devices.length) {
-        throw new Error("No camera found");
-      }
-
-      const firstDeviceId = devices[0].deviceId;
-
-      codeReader.decodeFromVideoDevice(
-        firstDeviceId,
-        video,
-        (result, err) => {
-
-          if (result) {
-
-            const text = result.getText();
-            status.innerText = text;
-
-            codeReader.reset();
-
-            if (text.startsWith("http")) {
-              window.location.href = text;
-            } else {
-              window.location.href = `/animals/${text}`;
-            }
-
-          }
-
-        }
-
-      );
-
-    } catch (err) {
-      console.error(err);
-      status.innerText = "Error: " + err.message;
-    }
-
-  });
+  import("../scripts/qr-scanner.js");
 
 </script>
 
@@ -74,12 +25,15 @@
 }
 
 button {
-  padding: 10px 14px;
+  padding: 10px 15px;
   margin: 10px;
 }
 
 video {
+  width: 100%;
+  max-width: 400px;
   border-radius: 12px;
+  margin-top: 10px;
 }
 
 </style>
