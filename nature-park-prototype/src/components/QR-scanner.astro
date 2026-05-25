@@ -1,44 +1,33 @@
 <div class="scanner-container">
+
   <h2>Scan Animal QR Code</h2>
 
-  <div id="reader" style="width:100%; max-width:400px;"></div>
+  <button id="startScan">Start Scanner</button>
 
-  <p id="scan-result">Waiting for scan...</p>
+  <div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
+
+  <p id="scan-result">Scanner idle</p>
+
 </div>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<script type="module">
 
-<script is:inline>
+  import { Html5QrcodeScanner } from "html5-qrcode";
 
-  window.addEventListener("DOMContentLoaded", () => {
+  const resultBox = document.getElementById("scan-result");
+  const startBtn = document.getElementById("startScan");
 
-    const resultBox = document.getElementById("scan-result");
+  let scanner;
 
-    function onScanSuccess(decodedText) {
+  startBtn.addEventListener("click", () => {
 
-      resultBox.innerText = "Scanned: " + decodedText;
+    resultBox.innerText = "Starting camera...";
 
-      // Full URL QR
-      if (decodedText.startsWith("http")) {
-        window.location.href = decodedText;
-        return;
-      }
-
-      // ID-based QR
-      const id = decodedText.trim();
-      window.location.href = `/animals/${id}`;
-    }
-
-    function onScanError(error) {
-      // ignore noise
-    }
-
-    const scanner = new Html5QrcodeScanner(
+    scanner = new Html5QrcodeScanner(
       "reader",
       {
         fps: 10,
-        qrbox: 250,
-        rememberLastUsedCamera: true
+        qrbox: 250
       },
       false
     );
@@ -47,24 +36,34 @@
 
   });
 
+  function onScanSuccess(decodedText) {
+
+    resultBox.innerText = decodedText;
+
+    if (decodedText.startsWith("http")) {
+      window.location.href = decodedText;
+      return;
+    }
+
+    window.location.href = `/animals/${decodedText}`;
+  }
+
+  function onScanError(error) {
+    // ignore scan noise
+  }
+
 </script>
 
 <style>
 .scanner-container {
-  padding: 20px;
   text-align: center;
+  padding: 20px;
   font-family: Arial, sans-serif;
 }
 
-#reader {
-  margin: 20px auto;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-#scan-result {
-  margin-top: 10px;
-  color: #2f6b2f;
-  font-weight: bold;
+button {
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  cursor: pointer;
 }
 </style>
