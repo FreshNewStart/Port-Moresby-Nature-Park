@@ -1,8 +1,8 @@
-<div class="scanner-container">
+<div class="scanner">
 
   <h2>Scan Animal QR Code</h2>
 
-  <button id="startScan">Start Scan</button>
+  <button id="start">Start Scanner</button>
 
   <div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
 
@@ -10,65 +10,72 @@
 
 </div>
 
-<!-- FIXED CDN -->
-<script src="https://unpkg.com/html5-qrcode"></script>
+<!-- STABLE FIX -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@latest/html5-qrcode.min.js"></script>
 
 <script is:inline>
 
-  let scanner;
+  let qr;
   const status = document.getElementById("status");
 
-  document.getElementById("startScan").addEventListener("click", () => {
+  document.getElementById("start").addEventListener("click", async () => {
 
     try {
 
-      status.innerText = "Loading camera...";
+      status.innerText = "Starting camera...";
 
-      if (!window.Html5QrcodeScanner) {
+      if (!window.Html5Qrcode) {
         throw new Error("Library failed to load");
       }
 
-      scanner = new window.Html5QrcodeScanner(
-        "reader",
+      qr = new Html5Qrcode("reader");
+
+      const cameras = await Html5Qrcode.getCameras();
+
+      if (!cameras.length) {
+        throw new Error("No camera found");
+      }
+
+      const cameraId = cameras[0].id;
+
+      await qr.start(
+        cameraId,
         {
           fps: 10,
           qrbox: 250
         },
-        false
-      );
+        (decodedText) => {
 
-      scanner.render(onScanSuccess, onScanError);
+          status.innerText = decodedText;
+
+          if (decodedText.startsWith("http")) {
+            window.location.href = decodedText;
+          } else {
+            window.location.href = `/animals/${decodedText}`;
+          }
+
+        }
+      );
 
     } catch (err) {
       console.error(err);
-      status.innerText = err.message;
+      status.innerText = "Error: " + err.message;
     }
 
   });
 
-  function onScanSuccess(decodedText) {
-
-    status.innerText = decodedText;
-
-    if (decodedText.startsWith("http")) {
-      window.location.href = decodedText;
-    } else {
-      window.location.href = `/animals/${decodedText}`;
-    }
-  }
-
-  function onScanError(err) {}
-
 </script>
 
 <style>
-.scanner-container {
+
+.scanner {
   text-align: center;
   padding: 20px;
 }
 
 button {
-  padding: 10px 15px;
+  padding: 10px 14px;
   margin: 10px;
 }
+
 </style>
