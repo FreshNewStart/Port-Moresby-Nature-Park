@@ -6,31 +6,32 @@
 
   <div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
 
-  <p id="scan-result">Scanner idle</p>
+  <p id="status">Idle</p>
 
 </div>
 
-<!-- IMPORTANT: Load library via CDN -->
-<script src="https://unpkg.com/html5-qrcode"></script>
+<!-- IMPORTANT: load FIRST -->
+<script src="https://unpkg.com/html5-qrcode@2.3.10/minified/html5-qrcode.min.js"></script>
 
 <script is:inline>
 
   let scanner;
 
-  const startBtn = document.getElementById("startScan");
-  const resultBox = document.getElementById("scan-result");
+  const status = document.getElementById("status");
+  const btn = document.getElementById("startScan");
 
-  startBtn.addEventListener("click", async () => {
-
-    resultBox.innerText = "Starting camera...";
-
-    // Prevent double initialization
-    if (scanner) {
-      return;
-    }
+  btn.addEventListener("click", async () => {
 
     try {
-      scanner = new Html5QrcodeScanner(
+
+      status.innerText = "Starting camera...";
+
+      // 🔥 IMPORTANT: wait for library to exist
+      if (!window.Html5QrcodeScanner) {
+        throw new Error("QR library not loaded");
+      }
+
+      scanner = new window.Html5QrcodeScanner(
         "reader",
         {
           fps: 10,
@@ -45,47 +46,36 @@
 
     } catch (err) {
       console.error(err);
-      resultBox.innerText = "Camera failed to start";
+      status.innerText = "ERROR: " + err.message;
     }
 
   });
 
   function onScanSuccess(decodedText) {
 
-    resultBox.innerText = "Scanned: " + decodedText;
+    status.innerText = decodedText;
 
-    // URL QR
     if (decodedText.startsWith("http")) {
       window.location.href = decodedText;
-      return;
+    } else {
+      window.location.href = `/animals/${decodedText}`;
     }
-
-    // ID QR
-    window.location.href = `/animals/${decodedText}`;
   }
 
-  function onScanError(error) {
-    // ignore scan noise
+  function onScanError(err) {
+    // ignore
   }
 
 </script>
 
 <style>
-
 .scanner-container {
   text-align: center;
   padding: 20px;
-  font-family: Arial, sans-serif;
 }
 
 button {
-  padding: 10px 16px;
+  padding: 10px 15px;
   margin: 10px;
-  cursor: pointer;
 }
-
-#reader {
-  margin-top: 10px;
-}
-
 </style>
