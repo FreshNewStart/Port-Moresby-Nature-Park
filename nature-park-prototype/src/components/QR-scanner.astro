@@ -2,7 +2,7 @@
 
   <h2>Scan Animal QR Code</h2>
 
-  <button id="startScan">Start Scanner</button>
+  <button id="startScan">Start Scan</button>
 
   <div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
 
@@ -10,41 +10,57 @@
 
 </div>
 
-<script type="module">
+<!-- IMPORTANT: Load library via CDN -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-  import { Html5QrcodeScanner } from "html5-qrcode";
-
-  const resultBox = document.getElementById("scan-result");
-  const startBtn = document.getElementById("startScan");
+<script is:inline>
 
   let scanner;
 
-  startBtn.addEventListener("click", () => {
+  const startBtn = document.getElementById("startScan");
+  const resultBox = document.getElementById("scan-result");
+
+  startBtn.addEventListener("click", async () => {
 
     resultBox.innerText = "Starting camera...";
 
-    scanner = new Html5QrcodeScanner(
-      "reader",
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      false
-    );
+    // Prevent double initialization
+    if (scanner) {
+      return;
+    }
 
-    scanner.render(onScanSuccess, onScanError);
+    try {
+      scanner = new Html5QrcodeScanner(
+        "reader",
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        false
+      );
+
+      scanner.render(onScanSuccess, onScanError);
+
+      console.log("Scanner started");
+
+    } catch (err) {
+      console.error(err);
+      resultBox.innerText = "Camera failed to start";
+    }
 
   });
 
   function onScanSuccess(decodedText) {
 
-    resultBox.innerText = decodedText;
+    resultBox.innerText = "Scanned: " + decodedText;
 
+    // URL QR
     if (decodedText.startsWith("http")) {
       window.location.href = decodedText;
       return;
     }
 
+    // ID QR
     window.location.href = `/animals/${decodedText}`;
   }
 
@@ -55,6 +71,7 @@
 </script>
 
 <style>
+
 .scanner-container {
   text-align: center;
   padding: 20px;
@@ -62,8 +79,13 @@
 }
 
 button {
-  padding: 10px 20px;
-  margin-bottom: 10px;
+  padding: 10px 16px;
+  margin: 10px;
   cursor: pointer;
 }
+
+#reader {
+  margin-top: 10px;
+}
+
 </style>
