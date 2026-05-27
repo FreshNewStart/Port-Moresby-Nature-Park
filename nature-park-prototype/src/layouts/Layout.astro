@@ -8,6 +8,26 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Nature Park Explore</title>
+		<script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #reader {
+            width: 400px;
+            max-width: 100%;
+            margin: auto;
+        }
+
+        #result {
+            color: blue;
+            word-break: break-word;
+        }
+    </style>
 	</head>
 	<body>
 		<slot />
